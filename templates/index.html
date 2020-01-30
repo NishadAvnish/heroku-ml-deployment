@@ -1,0 +1,18 @@
+<html>
+<head>
+   
+</head>
+<body>
+<form action="{{url for('predict')}}" method="post">
+<input type="file" name="myImage" accept="image/x-png,image/gif,image/jpeg" required="required" />
+<label for="fileupload"> Select a file to upload</label>
+</br>
+</br>
+<button type="submit" class="btn btn-primary btn-block ctn-large">Predict</button>
+</form>
+
+</br>
+{{predicted_text}}
+
+</body>
+</html>
