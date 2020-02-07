@@ -6,7 +6,8 @@
 from PIL import Image 
 import numpy as np 
 import flask 
-import cv2
+import io 
+from keras.models import load_model
 import joblib
   
 # Create Flask application and initialize Keras model 
@@ -48,20 +49,16 @@ def predict():
     # Check if image was properly sent to our endpoint 
     if flask.request.method == "POST": 
         if flask.request.files.get("image"): 
-            image = flask.request.files["image"]
-            nparr = np.fromstring(image.data, np.uint8)
-            img = cv2.imread(nparr,cv2.IMREAD_COLOR)
-            img = cv2.resize(img, (128,128))
-            a=np.array(img)
+            image = flask.request.files["image"].read() 
+            image = Image.open(io.BytesIO(image)) 
             
-            a.resize(1,128,128,3)
             # Resize it to 224x224 pixels  
             # (required input dimensions for ResNet) 
-           # prepare_image(image, target =(128,128)) 
+            prepare_image(image, target =(128,128)) 
              
-            print("avnish {}".format(model))
+            print("avnish {}".format(image1))
             
-            preds = model.predict(a) 
+            preds = model.predict(image1) 
             
             if(preds[0][0]>preds[0][1]):
                 data["predictions"]="Normal"
@@ -80,4 +77,4 @@ if __name__ == "__main__":
     print(("* Loading Keras model and Flask starting server..."
         "please wait until server has fully started")) 
     load_models() 
-    app.run() 
+    app.run(threaded=False) 
