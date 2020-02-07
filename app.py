@@ -7,20 +7,13 @@ from PIL import Image
 import numpy as np 
 import flask 
 import io 
-from keras.models import load_model
 import joblib
-from flask import render_template
   
 # Create Flask application and initialize Keras model 
 app = flask.Flask(__name__) 
-model = None
 image1=None
-# Function to Load the model  
-def load_models(): 
-      
-    # global variables, to be used in another function 
-    global model      
-    model= joblib.load('outputfile.pkl') 
+# Function to Load the model   
+    
   
 # Every ML/DL model has a specific format 
 # of taking input. Before we can predict on 
@@ -41,14 +34,14 @@ def prepare_image(image, target):
     
 @app.route("/",methods=["GET"])
 def home():
-     return "HELLO, go to http://127.0.0.1:5000//predict"
+     return "https://keraspothhole.herokuapp.com/predict"
   
 # Now, we can predict the results. 
 @app.route("/predict", methods =["POST","GET"]) 
 def predict(): 
     data = {} # dictionary to store result 
     data["success"] = False
-  
+    model= joblib.load('outputfile.pkl') 
     # Check if image was properly sent to our endpoint 
     if flask.request.method == "POST": 
         if flask.request.files.get("image"): 
@@ -75,7 +68,5 @@ def predict():
   
   
 if __name__ == "__main__": 
-    print(("* Loading Keras model and Flask starting server..."
-        "please wait until server has fully started")) 
-    load_models() 
+    
     app.run(threaded=False) 
