@@ -8,7 +8,7 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 Flask==1.1.1
 gunicorn==19.9.0
-Pillow==5.4.1
+Pillow==6.2.0
 joblib==0.14.1
 pip==19.0.3
 aniso8601==4.1.0
