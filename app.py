@@ -9,6 +9,7 @@ import flask
 import io 
 from keras.models import load_model
 import joblib
+from flask import render_template
   
 # Create Flask application and initialize Keras model 
 app = flask.Flask(__name__) 
@@ -38,7 +39,9 @@ def prepare_image(image, target):
     # as required by the Model 
     image1.resize(1,128,128,3)
     
- 
+@app.route("/",methods=["GET"])
+def home():
+     return "HELLO, go to http://127.0.0.1:5000//predict"
   
 # Now, we can predict the results. 
 @app.route("/predict", methods =["POST","GET"]) 
@@ -56,14 +59,12 @@ def predict():
             # (required input dimensions for ResNet) 
             prepare_image(image, target =(128,128)) 
              
-            print("avnish {}".format(image1))
-            
             preds = model.predict(image1) 
             
             if(preds[0][0]>preds[0][1]):
-                data["predictions"]="Normal"
+                data["pothhole"]=False
             else:
-                data["predictions"]="Pothhole"
+                data["pothhole"]=True
   
   
             data["success"] = True
