@@ -1,40 +1,84 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan 30 00:24:21 2020
-
-@author: avnis
-"""
-
-import numpy as np
-from flask import Flask, request, jsonify, render_template
-import pickle
-
-app = Flask(__name__)
-model = pickle.load(open('outputfile.pkl', 'rb'))
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/predict',methods=['POST'])
-def predict():
-    '''
-    For rendering results on HTML GUI
-    '''
-    int_features = [int(x) for x in request.form.values()]
-    final_features = [np.array(int_features)]
-    predicted_value = model.predict(final_features)
-
-    #output = round(prediction[0], 2)
-    output=""
-    for value in predicted_value:
-        if(value[0]>value[1]):
-            output="Normal"
-        else:
-            output="PothHole"
-
-    return render_template('index.html', prediction_text='The image is : {}'.format(output))
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+# keras_server.py 
+  
+# Python program to expose a ML model as flask REST API 
+  
+# import the necessary modules 
+from keras.applications import ResNet50 # pre-built CNN Model 
+from keras.preprocessing.image import img_to_array  
+from keras.applications import imagenet_utils 
+import tensorflow as tf 
+from PIL import Image 
+import numpy as np 
+import flask 
+import io 
+from keras.models import load_model
+import joblib
+  
+# Create Flask application and initialize Keras model 
+app = flask.Flask(__name__) 
+model = None
+image1=None
+# Function to Load the model  
+def load_models(): 
+      
+    # global variables, to be used in another function 
+    global model      
+    model= joblib.load('outputfile.pkl') 
+  
+# Every ML/DL model has a specific format 
+# of taking input. Before we can predict on 
+# the input image, we first need to preprocess it. 
+def prepare_image(image, target): 
+    #if image.mode != "RGB": 
+    #    image = image.convert("RGB") 
+    
+    # Resize the image to the target dimensions 
+    image = image.resize(target)  
+    # PIL Image to Numpy array
+    global image1
+    image1=np.array(image)  
+    
+    # Expand the shape of an array, 
+    # as required by the Model 
+    image1.resize(1,128,128,3)
+    
+ 
+  
+# Now, we can predict the results. 
+@app.route("/predict", methods =["POST","GET"]) 
+def predict(): 
+    data = {} # dictionary to store result 
+    data["success"] = False
+  
+    # Check if image was properly sent to our endpoint 
+    if flask.request.method == "POST": 
+        if flask.request.files.get("image"): 
+            image = flask.request.files["image"].read() 
+            image = Image.open(io.BytesIO(image)) 
+            
+            # Resize it to 224x224 pixels  
+            # (required input dimensions for ResNet) 
+            prepare_image(image, target =(128,128)) 
+             
+            print("avnish {}".format(model))
+            
+            preds = model.predict(image1) 
+            
+            if(preds[0][0]>preds[0][1]):
+                data["predictions"]="Normal"
+            else:
+                data["predictions"]="Pothhole"
+  
+  
+            data["success"] = True
+  
+    # return JSON response 
+    return flask.jsonify(data) 
+  
+  
+  
+if __name__ == "__main__": 
+    print(("* Loading Keras model and Flask starting server..."
+        "please wait until server has fully started")) 
+    load_models() 
+    app.run() 

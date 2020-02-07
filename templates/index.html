@@ -3,16 +3,16 @@
    
 </head>
 <body>
-<form action="{{url for('predict')}}" method="post">
-<input type="file" name="myImage" accept="image/x-png,image/gif,image/jpeg" required="required" />
-<label for="fileupload"> Select a file to upload</label>
+<form action='/predict' method='POST'>
+<input type="file" name="file" accept="image/x-png,image/gif,image/jpeg" required="required" />
+
 </br>
 </br>
 <button type="submit" class="btn btn-primary btn-block ctn-large">Predict</button>
 </form>
 
 </br>
-{{predicted_text}}
+<p>{{predicted_text}}</p>
 
 </body>
 </html>
