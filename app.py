@@ -1,10 +1,12 @@
+# import the necessary modules
+from PIL import Image
 import numpy as np
-from flask import Flask, request, jsonify
-import pickle
+import flask
+import io
 import joblib
 
-
-app = Flask(__name__)
+# Create Flask application and initialize Keras model
+app = flask.Flask(__name__)
 image1 = None
 # Function to Load the model   
 model = joblib.load('eww1.pkl')
@@ -14,12 +16,13 @@ model = joblib.load('eww1.pkl')
 # of taking input. Before we can predict on 
 # the input image, we first need to preprocess it. 
 def prepare_image(image):
-    # Resize it to 224x224 pixels  
-    # (required input dimensions for ResNet) 
-    image = image.resize(224, 224)
+    image = image.resize((224, 224))
     # PIL Image to Numpy array
     global image1
     image1 = np.array(image)
+
+    # Expand the shape of an array,
+    # as required by the Model
     image1.resize(1, 224, 224, 3)
 
 
@@ -31,7 +34,7 @@ def home():
 # Now, we can predict the results. 
 @app.route("/predict", methods=["POST", "GET"])
 def predict():
-    data = {"success": False}  # dictionary to store result 
+    data = {"success": False}  # dictionary to store result
 
     # Check if image was properly sent to our endpoint 
     if flask.request.method == "POST":
@@ -39,6 +42,8 @@ def predict():
             image = flask.request.files["image"].read()
             image = Image.open(io.BytesIO(image))
 
+            # Resize it to 224x224 pixels
+            # (required input dimensions for ResNet)
             prepare_image(image)
 
             categories = ["asphalt", "crack", "electronic", "furniture", "kitchen", "pants and flower", "pothhole",
