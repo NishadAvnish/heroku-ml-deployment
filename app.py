@@ -1,4 +1,10 @@
-app = flask.Flask(__name__)
+import numpy as np
+from flask import Flask, request, jsonify
+import pickle
+import joblib
+
+
+app = Flask(__name__)
 image1 = None
 # Function to Load the model   
 model = joblib.load('eww1.pkl')
