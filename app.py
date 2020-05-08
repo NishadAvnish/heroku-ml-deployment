@@ -46,14 +46,14 @@ def predict():
             # (required input dimensions for ResNet)
             prepare_image(image)
 
-            categories = ["asphalt", "crack", "electronic", "furniture", "kitchen", "pants and flower", "pothhole",
+            categories = ["asphalt", "crack", "electronic", "furniture", "kitchen", "pants and flower", "pothole",
                           "tree", "vehicles", "wall"]
-
+            data_list = list()
             preds = model.predict(image1)
             for i in range(0, len(preds[0])):
                 if preds[0][i] > 0:
-                    data[categories[i]] = True
-
+                    data_list.append(categories[i])
+            data["data"] = data_list
             data["success"] = True
 
     # return JSON response 
